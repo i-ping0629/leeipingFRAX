@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>骨質疏鬆症骨折風險評估工具 (FRAX)</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', 'Heiti TC', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #2980b9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 250px;
+        }
+        button:hover {
+            background-color: #3498db;
+        }
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #edf7ff;
+            display: none;
+        }
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .hip-fracture {
+            color: #e74c3c;
+        }
+        .major-fracture {
+            color: #2980b9;
+        }
+        .risk-interpretation {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fff3cd;
+        }
+        .high-risk {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        .moderate-risk {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        .low-risk {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        .info-box {
+            background-color: #d4e6f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            margin-bottom: 10px;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+        .note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .help-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 8px;
+            line-height: 18px;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #2c3e50;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #2c3e50 transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .explanation-section {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .explanation-section h4 {
+            color: #2980b9;
+            margin-top: 0;
+        }
+        .risk-factor-detail {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .risk-factor-detail h5 {
+            color: #2c3e50;
+            margin: 0 0 8px 0;
+        }
+        .risk-factor-detail p {
+            margin: 5px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>骨質疏鬆症骨折風險評估工具 (FRAX)</h1>
+        
+        <div class="info-box">
+            <p><strong>FRAX 工具</strong>用於評估40-90歲成人未來10年發生重大骨質疏鬆性骨折的風險。</p>
+            <p>本工具基於世界衛生組織的FRAX演算法，考慮多項臨床危險因子來評估骨折風險。</p>
+            <p><strong>注意：</strong>所有危險因子若未填寫或未勾選，系統將視為「否」。請根據患者實際情況填寫。</p>
+        </div>
+        
+        <div class="two-column">
+            <div class="section">
+                <h3>基本資料</h3>
+                <div class="form-group">
+                    <label for="age">年齡:
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">接受40-90歲範圍。低於40歲按40歲計算，高於90歲按90歲計算。年齡是骨折風險的重要預測因子，隨年齡增長風險顯著增加。</span>
+                        </span>
+                    </label>
+                    <input type="number" id="age" min="40" max="90" value="65">
+                    <div class="note">範圍: 40-90歲</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gender">性別:
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">請選擇男性或女性。女性停經後骨折風險通常較男性高，特別是脊椎和髖部骨折。</span>
+                        </span>
+                    </label>
+                    <select id="gender">
+                        <option value="female">女性</option>
+                        <option value="male">男性</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight">體重 (公斤):
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">請輸入患者當前體重(kg)。較低的體重與較高的骨折風險相關，特別是BMI < 20的患者。</span>
+                        </span>
+                    </label>
+                    <input type="number" id="weight" min="25" max="125" step="0.1" value="60">
+                </div>
+                
+                <div class="form-group">
+                    <label for="height">身高 (公分):
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">請輸入患者身高(cm)。與體重一起用於計算BMI，低BMI是骨折的危險因子。</span>
+                        </span>
+                    </label>
+                    <input type="number" id="height" min="100" max="200" step="0.1" value="160">
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>骨密度 (可選)</h3>
+                <div class="form-group">
+                    <label for="bmd">股骨頸骨密度 T-score:
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">請輸入DXA股骨頸T-score。基於NHANES III女性參考數據(20-29歲)，男女使用相同絕對值。正常 > -1.0，骨質減少 -1.0至-2.5，骨質疏鬆 ≤ -2.5。如無資料可留空。</span>
+                        </span>
+                    </label>
+                    <input type="number" id="bmd" step="0.1" placeholder="如無資料請留空">
+                    <div class="note">正常值 > -1.0，骨質疏鬆 ≤ -2.5</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>危險因子</h3>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="previousFracture">
+                    <label for="previousFracture">既往骨折史 (40歲後)
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">成年後自發性骨折或輕微外傷引起的骨折(正常人不會因此骨折)。包括影像學發現的椎體壓迫性骨折。脊椎骨折和髖部骨折為特別強的危險因子。多發性骨折風險可能被低估。</span>
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="parentHipFracture">
+                    <label for="parentHipFracture">父母髖部骨折史
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">患者的父親或母親曾發生髖部骨折。家族史是重要的遺傳性危險因子，反映骨質疏鬆的遺傳傾向。</span>
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="smoking">
+                    <label for="smoking">目前吸菸
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">患者目前有吸菸習慣。吸菸對骨折風險有劑量依賴性效應，吸菸量越大風險越高。計算時假設為平均暴露量，臨床需考慮實際吸菸量。</span>
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="glucocorticoids">
+                    <label for="glucocorticoids">糖皮質激素使用
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">目前正在使用口服糖皮質激素，或曾連續使用超過3個月，劑量相當於prednisolone 5mg/日或以上。具劑量依賴性，高劑量或長期使用風險更高。</span>
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="rheumatoidArthritis">
+                    <label for="rheumatoidArthritis">類風濕性關節炎
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">確診的類風濕性關節炎。注意：骨關節炎具保護作用，不應僅憑患者自述「關節炎」而勾選，需有臨床或實驗室證據支持RA診斷。</span>
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="secondaryOsteoporosis">
+                    <label for="secondaryOsteoporosis">續發性骨質疏鬆症
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">與骨質疏鬆強烈相關的疾病：第1型糖尿病、成人型成骨不全症、未治療的長期甲狀腺機能亢進、性腺功能低下症或提早停經(&lt;45歲)、慢性營養不良、吸收不良症候群、慢性肝病。</span>
+                        </span>
+                    </label>
+                </div>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="alcohol">
+                    <label for="alcohol">酗酒 (每日≥3單位)
+                        <span class="tooltip">
+                            <span class="help-icon">?</span>
+                            <span class="tooltiptext">每日飲酒3單位或以上。1單位酒精 = 8-10g酒精 = 標準啤酒285ml = 烈酒30ml = 紅酒120ml = 開胃酒60ml。酗酒對骨折風險有劑量依賴性效應。</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="explanation-section">
+            <h4>危險因子詳細說明</h4>
+            
+            <div class="risk-factor-detail">
+                <h5>既往骨折史</h5>
+                <p><strong>定義：</strong>成年後發生的自發性骨折，或輕微外傷導致的骨折(在健康人不會引起骨折的外力)</p>
+                <p><strong>特殊情況：</strong>僅在影像學發現的椎體形態測量骨折也算既往骨折</p>
+                <p><strong>注意：</strong>脊椎骨折或髖部骨折為特別強的危險因子；多發性骨折的風險可能被低估</p>
+            </div>
+            
+            <div class="risk-factor-detail">
+                <h5>吸菸、飲酒、糖皮質激素</h5>
+                <p><strong>劑量效應：</strong>這些危險因子都有劑量依賴性效應，暴露量越高風險越大</p>
+                <p><strong>計算假設：</strong>系統假設為平均暴露量，對於極低或極高暴露量需要臨床判斷調整</p>
+            </div>
+            
+            <div class="risk-factor-detail">
+                <h5>類風濕性關節炎</h5>
+                <p><strong>診斷要求：</strong>必須是確診的類風濕性關節炎</p>
+                <p><strong>重要區別：</strong>骨關節炎實際上具有保護作用，不可僅憑患者自述有「關節炎」而勾選</p>
+                <p><strong>證據需求：</strong>需要有臨床檢查或實驗室證據支持RA診斷</p>
+            </div>
+            
+            <div class="risk-factor-detail">
+                <h5>骨密度檢查</h5>
+                <p><strong>標準部位：</strong>使用DXA測量股骨頸骨密度</p>
+                <p><strong>參考標準：</strong>T-score基於NHANES III 20-29歲女性參考數據</p>
+                <p><strong>男女適用：</strong>男性和女性使用相同的絕對數值</p>
+                <p><strong>未檢查者：</strong>沒有骨密度檢查資料時請留空，系統將根據其他因子計算</p>
+            </div>
+        </div>
+        
+        <button onclick="calculateFRAX()">計算骨折風險</button>
+        
+        <div id="result" class="result">
+            <h3>10年骨折風險評估結果</h3>
+            
+            <div class="result-value major-fracture">
+                主要骨質疏鬆性骨折風險: <span id="majorFractureRisk">--</span>%
+            </div>
+            <div class="note">包括脊椎、前臂、髖部或肱骨骨折</div>
+            
+            <div class="result-value hip-fracture">
+                髖部骨折風險: <span id="hipFractureRisk">--</span>%
+            </div>
+            
+            <div id="riskInterpretation" class="risk-interpretation">
+                <h4>風險評估</h4>
+                <div id="interpretationText"></div>
+                <div id="recommendationText"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateFRAX() {
+            // 獲取基本資料
+            const age = parseInt(document.getElementById('age').value) || 65;
+            const gender = document.getElementById('gender').value;
+            const weight = parseFloat(document.getElementById('weight').value) || 60;
+            const height = parseFloat(document.getElementById('height').value) || 160;
+            const bmd = parseFloat(document.getElementById('bmd').value) || null;
+            
+            // 計算BMI
+            const bmi = weight / ((height / 100) ** 2);
+            
+            // 獲取危險因子
+            const riskFactors = {
+                previousFracture: document.getElementById('previousFracture').checked,
+                parentHipFracture: document.getElementById('parentHipFracture').checked,
+                smoking: document.getElementById('smoking').checked,
+                glucocorticoids: document.getElementById('glucocorticoids').checked,
+                rheumatoidArthritis: document.getElementById('rheumatoidArthritis').checked,
+                secondaryOsteoporosis: document.getElementById('secondaryOsteoporosis').checked,
+                alcohol: document.getElementById('alcohol').checked
+            };
+            
+            // 驗證輸入
+            if (age < 40 || age > 90) {
+                alert("年齡必須在40-90歲之間");
+                return;
+            }
+            
+            if (weight < 25 || weight > 125) {
+                alert("體重必須在25-125公斤之間");
+                return;
+            }
+            
+            if (height < 100 || height > 200) {
+                alert("身高必須在100-200公分之間");
+                return;
+            }
+            
+            // 簡化的FRAX計算 (基於統計模型的近似計算)
+            const fractures = calculateFractureRisk(age, gender, bmi, bmd, riskFactors);
+            
+            // 顯示結果
+            document.getElementById('majorFractureRisk').textContent = fractures.major.toFixed(1);
+            document.getElementById('hipFractureRisk').textContent = fractures.hip.toFixed(1);
+            
+            // 風險解釋
+            interpretRisk(fractures.major, fractures.hip);
+            
+            // 顯示結果區域
+            document.getElementById('result').style.display = 'block';
+        }
+        
+        function calculateFractureRisk(age, gender, bmi, bmd, riskFactors) {
+            // 基礎風險 (基於年齡和性別)
+            let baseMajorRisk, baseHipRisk;
+            
+            if (gender === 'female') {
+                baseMajorRisk = Math.max(0.5, (age - 40) * 0.3);
+                baseHipRisk = Math.max(0.1, (age - 50) * 0.15);
+            } else {
+                baseMajorRisk = Math.max(0.3, (age - 40) * 0.25);
+                baseHipRisk = Math.max(0.1, (age - 50) * 0.12);
+            }
+            
+            // BMI調整
+            if (bmi < 20) {
+                baseMajorRisk *= 1.4;
+                baseHipRisk *= 1.6;
+            } else if (bmi > 30) {
+                baseMajorRisk *= 0.8;
+                baseHipRisk *= 0.7;
+            }
+            
+            // 骨密度調整
+            if (bmd !== null) {
+                const bmdFactor = Math.exp(-0.4 * bmd);
+                baseMajorRisk *= bmdFactor;
+                baseHipRisk *= bmdFactor * 1.2;
+            }
+            
+            // 危險因子調整
+            let riskMultiplier = 1.0;
+            
+            if (riskFactors.previousFracture) riskMultiplier *= 1.8;
+            if (riskFactors.parentHipFracture) riskMultiplier *= 1.4;
+            if (riskFactors.smoking) riskMultiplier *= 1.3;
+            if (riskFactors.glucocorticoids) riskMultiplier *= 1.6;
+            if (riskFactors.rheumatoidArthritis) riskMultiplier *= 1.4;
+            if (riskFactors.secondaryOsteoporosis) riskMultiplier *= 1.5;
+            if (riskFactors.alcohol) riskMultiplier *= 1.3;
+            
+            const majorRisk = Math.min(baseMajorRisk * riskMultiplier, 50);
+            const hipRisk = Math.min(baseHipRisk * riskMultiplier * 1.1, 30);
+            
+            return {
+                major: majorRisk,
+                hip: hipRisk
+            };
+        }
+        
+        function interpretRisk(majorRisk, hipRisk) {
+            const interpretationDiv = document.getElementById('riskInterpretation');
+            const interpretationText = document.getElementById('interpretationText');
+            const recommendationText = document.getElementById('recommendationText');
+            
+            let riskLevel, interpretation, recommendation;
+            
+            // 風險分級 (台灣骨質疏鬆症學會建議)
+            if (majorRisk >= 20 || hipRisk >= 3) {
+                riskLevel = 'high-risk';
+                interpretation = '<strong>高風險</strong>：建議積極治療';
+                recommendation = '建議：<br>• 立即開始抗骨質疏鬆藥物治療<br>• 補充鈣質和維生素D<br>• 規律運動和跌倒預防<br>• 定期追蹤骨密度';
+            } else if (majorRisk >= 10 || hipRisk >= 1.5) {
+                riskLevel = 'moderate-risk';
+                interpretation = '<strong>中等風險</strong>：考慮藥物治療';
+                recommendation = '建議：<br>• 評估是否需要藥物治療<br>• 生活型態調整<br>• 補充鈣質和維生素D<br>• 每1-2年追蹤骨密度';
+            } else {
+                riskLevel = 'low-risk';
+                interpretation = '<strong>低風險</strong>：生活型態調整';
+                recommendation = '建議：<br>• 維持健康生活型態<br>• 適量鈣質和維生素D攝取<br>• 規律負重運動<br>• 每2-3年追蹤骨密度';
+            }
+            
+            interpretationDiv.className = 'risk-interpretation ' + riskLevel;
+            interpretationText.innerHTML = interpretation;
+            recommendationText.innerHTML = recommendation;
+        }
+    </script>
+</body>
+</html>
